@@ -6,7 +6,9 @@ import { FilterPanel } from '@/components/layout/FilterPanel'
 import { EntityCard } from '@/components/cards/EntityCard'
 import { ProgressiveLoader } from '@/components/loaders/ProgressiveLoader'
 import { OutreachCopilot } from '@/components/copilot/OutreachCopilot'
-import { Search, SlidersHorizontal } from 'lucide-react'
+import { Search, SlidersHorizontal, LayoutGrid, List } from 'lucide-react'
+import { staggerContainer, fadeSlideUp } from '@/lib/motionVariants'
+import { Button } from './components/ui/button'
 
 const fadeSlide = {
     initial: { opacity: 0, y: 20 },
@@ -18,23 +20,40 @@ function WorkspaceHeader({ title, subtitle }: { title: string; subtitle: string 
     return (
         <motion.div
             layout
-            className="flex items-center justify-between mb-6"
-            {...fadeSlide}
-            transition={{ duration: 0.4 }}
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+            className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8"
         >
-            <div>
-                <h2 className="text-xl font-bold text-slate-100">{title}</h2>
-                <p className="text-sm text-slate-400 mt-0.5">{subtitle}</p>
-            </div>
-            <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-400 text-sm">
-                    <Search className="w-4 h-4" />
-                    <span>Search entities...</span>
+            <motion.div variants={fadeSlideUp}>
+                <h2 className="text-2xl font-black text-slate-100 tracking-tight">{title}</h2>
+                <p className="text-sm font-medium text-slate-500 mt-1">{subtitle}</p>
+            </motion.div>
+
+            <motion.div variants={fadeSlideUp} className="flex items-center gap-3">
+                <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 text-sm focus-within:border-teal-500/50 transition-all w-full md:w-64 group shadow-sm">
+                    <Search className="w-4 h-4 group-hover:text-teal-400 transition-colors" />
+                    <input
+                        type="text"
+                        placeholder="Search clusters..."
+                        className="bg-transparent border-none outline-none text-slate-200 placeholder:text-slate-600 w-full"
+                    />
                 </div>
-                <button className="p-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer">
+
+                <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-xl shadow-sm">
+                    <button className="p-2 rounded-lg bg-teal-500/10 text-teal-400 shadow-sm">
+                        <LayoutGrid className="w-4 h-4" />
+                    </button>
+                    <button className="p-2 rounded-lg text-slate-500 hover:text-slate-300">
+                        <List className="w-4 h-4" />
+                    </button>
+                </div>
+
+                <Button variant="outline" className="border-slate-800 text-slate-400 gap-2 h-11 px-4 rounded-xl hover:bg-slate-800">
                     <SlidersHorizontal className="w-4 h-4" />
-                </button>
-            </div>
+                    Config
+                </Button>
+            </motion.div>
         </motion.div>
     )
 }
@@ -47,18 +66,27 @@ function HomeView() {
     }
 
     return (
-        <motion.div className="p-6" {...fadeSlide} transition={{ duration: 0.4 }}>
+        <motion.div
+            className="p-8 pb-20 max-w-[1600px] mx-auto"
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+        >
             <WorkspaceHeader
-                title="Entity Discovery"
-                subtitle={`${results.length} entities matched across ${new Set(results.map(e => e.district)).size} districts`}
+                title="Intelligence Discovery"
+                subtitle={`System found ${results.length} mapped entities across ${new Set(results.map(e => e.district)).size} district clusters`}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+            <motion.div
+                variants={staggerContainer}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6"
+            >
                 <AnimatePresence mode="popLayout">
                     {results.map((entity, index) => (
                         <EntityCard key={entity.id} entity={entity} index={index} />
                     ))}
                 </AnimatePresence>
-            </div>
+            </motion.div>
             {results.length === 0 && (
                 <motion.div
                     className="flex flex-col items-center justify-center py-20 text-slate-500"

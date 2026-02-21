@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Home, Mail, Banknote, Shield, Sparkles } from 'lucide-react'
 import { useEngine } from '@/hooks/useEngine'
 import { cn } from '@/lib/utils'
+import { springTransition } from '@/lib/motionVariants'
 
 type View = 'home' | 'outreach' | 'funding' | 'admin'
 
@@ -37,21 +38,29 @@ export function Sidebar() {
                             key={view}
                             onClick={() => setCurrentView(view)}
                             className={cn(
-                                'relative flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-200 group cursor-pointer',
+                                'relative flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-300 group cursor-pointer z-10',
                                 isActive
-                                    ? 'bg-teal-500/15 text-teal-400'
-                                    : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800'
+                                    ? 'text-teal-400'
+                                    : 'text-slate-500 hover:text-slate-300'
                             )}
-                            title={label}
                         >
                             {isActive && (
                                 <motion.div
                                     layoutId="sidebar-active"
-                                    className="absolute inset-0 rounded-xl bg-teal-500/15 border border-teal-500/20"
-                                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                                    className="absolute inset-0 rounded-xl bg-teal-500/10 border border-teal-500/20 shadow-[0_0_15px_rgba(20,184,166,0.1)]"
+                                    transition={springTransition as any}
                                 />
                             )}
-                            <Icon className="w-5 h-5 relative z-10" />
+                            <Icon className={cn(
+                                "w-5 h-5 relative z-10 transition-transform duration-300",
+                                isActive ? "scale-110" : "group-hover:scale-110"
+                            )} />
+
+                            {/* Tooltip */}
+                            <div className="absolute left-[110%] top-1/2 -translate-y-1/2 px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-[10px] text-slate-200 opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl">
+                                {label}
+                            </div>
+
                             <span className="text-[10px] font-medium relative z-10">{label}</span>
                         </button>
                     )

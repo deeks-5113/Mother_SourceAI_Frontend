@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { Sparkles } from 'lucide-react'
+import { springTransition } from '@/lib/motionVariants'
 
 interface ReasoningChainProps {
     reasoning: string
@@ -16,32 +17,35 @@ export function ReasoningChain({ reasoning, isExpanded: controlledExpanded }: Re
             {controlledExpanded === undefined && (
                 <button
                     onClick={(e) => { e.stopPropagation(); setInternalExpanded(!internalExpanded); }}
-                    className="flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-300 transition-colors mb-2 cursor-pointer"
+                    className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-violet-400 hover:text-violet-300 transition-colors mb-3 cursor-pointer group"
                 >
-                    <Sparkles className="w-3 h-3" />
-                    {isExpanded ? 'Hide' : 'View'} AI Reasoning
+                    <Sparkles className="w-3 h-3 group-hover:rotate-12 transition-transform" />
+                    {isExpanded ? 'Hide' : 'Analyze'} Resonance
                 </button>
             )}
 
             <AnimatePresence>
                 {isExpanded && (
                     <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                        initial={{ opacity: 0, height: 0, y: -10 }}
+                        animate={{ opacity: 1, height: 'auto', y: 0 }}
+                        exit={{ opacity: 0, height: 0, y: -10 }}
+                        transition={springTransition}
                         className="overflow-hidden"
                     >
                         <div
-                            className="relative rounded-lg p-3 text-xs leading-relaxed text-violet-200/80"
-                            style={{
-                                background: 'rgba(139, 92, 246, 0.08)',
-                                border: '1px solid rgba(139, 92, 246, 0.15)',
-                                boxShadow: '0 0 20px rgba(139, 92, 246, 0.1), inset 0 0 20px rgba(139, 92, 246, 0.05)',
-                            }}
+                            className="relative rounded-xl p-4 text-xs font-medium leading-relaxed text-violet-100/90 glass-card bg-violet-500/5 border-violet-500/20 shadow-[inset_0_0_20px_rgba(167,139,250,0.05)]"
                         >
-                            <Sparkles className="w-3.5 h-3.5 text-violet-400 inline mr-1.5 -mt-0.5" />
-                            {reasoning}
+                            <div className="flex gap-2.5">
+                                <Sparkles className="w-4 h-4 text-violet-400 shrink-0" />
+                                <motion.p
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.5, delay: 0.2 }}
+                                >
+                                    {reasoning}
+                                </motion.p>
+                            </div>
                         </div>
                     </motion.div>
                 )}

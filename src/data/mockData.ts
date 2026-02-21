@@ -9,17 +9,38 @@ export interface Entity {
     relevance: number
     ai_reasoning: string
     draftEmail: string
+    rank?: number
+    content?: string
+    semantic_summary?: string
 }
 
 export const districts = [
+    'Alluri Sitharama Raju',
+    'Anakapalli',
     'Anantapur',
+    'Annamayya',
+    'Bapatla',
     'Chittoor',
+    'Dr. B.R. Ambedkar Konaseema',
+    'East Godavari',
+    'Eluru',
     'Guntur',
+    'Kakinada',
     'Krishna',
     'Kurnool',
-    'Nellore',
+    'Nandyal',
+    'NTR',
+    'Palnadu',
+    'Parvathipuram Manyam',
     'Prakasam',
+    'Sri Potti Sriramulu Nellore',
+    'Sri Sathya Sai',
+    'Srikakulam',
+    'Tirupati',
     'Visakhapatnam',
+    'Vizianagaram',
+    'West Godavari',
+    'YSR Kadapa',
 ]
 
 export const mockEntities: Entity[] = [

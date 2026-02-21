@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Skeleton } from '@/components/ui/skeleton'
+import { staggerContainer, fadeSlideUp } from '@/lib/motionVariants'
 
 const loadingPhrases = [
     'Vectorizing PHC data...',
@@ -22,45 +23,50 @@ export function ProgressiveLoader() {
     }, [])
 
     return (
-        <div className="space-y-6 p-6">
+        <div className="space-y-10 p-8 max-w-[1600px] mx-auto">
             {/* Skeleton cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[...Array(6)].map((_, i) => (
+            <motion.div
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6"
+                variants={staggerContainer}
+                initial="initial"
+                animate="animate"
+            >
+                {[...Array(8)].map((_, i) => (
                     <motion.div
                         key={i}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.1, duration: 0.4 }}
-                        className="rounded-xl border border-slate-700/50 bg-slate-800/30 p-6 space-y-4"
+                        variants={fadeSlideUp}
+                        className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 space-y-6 shadow-sm"
                     >
                         <div className="flex items-start justify-between">
-                            <div className="space-y-2 flex-1">
-                                <Skeleton className="h-4 w-3/4 bg-slate-700/50" />
-                                <Skeleton className="h-3 w-1/2 bg-slate-700/30" />
+                            <div className="space-y-3 flex-1">
+                                <Skeleton className="h-5 w-3/4 bg-slate-800" />
+                                <Skeleton className="h-3 w-1/2 bg-slate-800" />
                             </div>
-                            <Skeleton className="w-12 h-12 rounded-full bg-slate-700/50" />
+                            <Skeleton className="w-12 h-12 rounded-full bg-slate-800" />
                         </div>
-                        <div className="space-y-2">
-                            <Skeleton className="h-3 w-full bg-slate-700/30" />
-                            <Skeleton className="h-3 w-5/6 bg-slate-700/20" />
+                        <div className="space-y-3">
+                            <Skeleton className="h-3 w-full bg-slate-800" />
+                            <Skeleton className="h-3 w-5/6 bg-slate-800 opacity-60" />
                         </div>
-                        <Skeleton className="h-16 w-full rounded-lg bg-violet-500/5" />
+                        <div className="pt-4 border-t border-slate-800">
+                            <Skeleton className="h-12 w-full rounded-xl bg-slate-800/50" />
+                        </div>
                     </motion.div>
                 ))}
-            </div>
+            </motion.div>
 
             {/* Cycling text */}
             <div className="flex items-center justify-center py-4">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 bg-slate-900/80 px-6 py-3 rounded-2xl border border-slate-800 shadow-xl">
                     <motion.div
-                        className="w-2 h-2 rounded-full bg-teal-500"
-                        animate={{ scale: [1, 1.5, 1] }}
+                        className="w-2 h-2 rounded-full bg-teal-500 shadow-[0_0_10px_rgba(20,184,166,0.5)]"
+                        animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
                         transition={{ duration: 1.5, repeat: Infinity }}
                     />
                     <AnimatePresence mode="wait">
                         <motion.p
                             key={phraseIndex}
-                            className="text-sm text-slate-400 font-mono"
+                            className="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono"
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}

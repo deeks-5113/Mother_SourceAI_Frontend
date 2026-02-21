@@ -1,5 +1,6 @@
 import { useState, createContext, useContext, type ReactNode } from 'react';
 import { type Entity, mockEntities } from '../data/mockData';
+import { apiService } from '../services/api';
 
 // Define the possible views for our State-Driven SPA
 type View = 'hero' | 'home' | 'outreach' | 'funding' | 'admin';
@@ -14,10 +15,12 @@ interface EngineContextType {
     filters: {
         districts: string[];
         environment: 'all' | 'rural' | 'urban';
+        specificNeed: string;
     };
     setFilters: React.Dispatch<React.SetStateAction<{
         districts: string[];
         environment: 'all' | 'rural' | 'urban';
+        specificNeed: string;
     }>>;
     results: Entity[];
     triggerSearch: (type: 'channels' | 'partners') => Promise<void>;
@@ -33,28 +36,47 @@ export function EngineProvider({ children }: { children: ReactNode }) {
     const [filters, setFilters] = useState<{
         districts: string[];
         environment: 'all' | 'rural' | 'urban';
+        specificNeed: string;
     }>({
         districts: [],
-        environment: 'all'
+        environment: 'all',
+        specificNeed: ''
     });
 
     // The "Judge-Winning" Search Trigger
-    const triggerSearch = async (_type: 'channels' | 'partners') => {
+    const triggerSearch = async (type: 'channels' | 'partners') => {
         setIsLoading(true);
 
-        // Simulate API Latency to show off the ProgressiveLoader
-        // In production, this connects to /api/v1/searches/channels or /api/v1/searches/partners
-        await new Promise((resolve) => setTimeout(resolve, 3500));
+        try {
+            if (type === 'channels') {
+                // Map frontend filters to backend request
+                // Backend API expects a single district, so we take the first or primary one
+                const district = filters.districts.length > 0 ? filters.districts[0] : 'Hyderabad';
+                const demographic = filters.environment === 'all' ? 'General' : (filters.environment.charAt(0).toUpperCase() + filters.environment.slice(1)) as 'Urban' | 'Rural';
 
-        // Logic to filter results based on selected parameters
-        const filtered = mockEntities.filter(e => {
-            const matchEnv = filters.environment === 'all' || e.ruralUrban.toLowerCase() === filters.environment;
-            const matchDist = filters.districts.length === 0 || filters.districts.includes(e.district);
-            return matchEnv && matchDist;
-        });
+                const responseResults = await apiService.searchChannels({
+                    district,
+                    demographic,
+                    specific_need: filters.specificNeed || 'General maternity outreach'
+                });
 
-        setResults(filtered);
-        setIsLoading(false);
+                setResults(responseResults);
+            } else {
+                // Fallback for 'partners' or other types (still using simulation for now)
+                await new Promise((resolve) => setTimeout(resolve, 3500));
+                const filtered = mockEntities.filter(e => {
+                    const matchEnv = filters.environment === 'all' || e.ruralUrban.toLowerCase() === filters.environment;
+                    const matchDist = filters.districts.length === 0 || filters.districts.includes(e.district);
+                    return matchEnv && matchDist;
+                });
+                setResults(filtered);
+            }
+        } catch (error) {
+            console.error("Discovery failed:", error);
+            // Optionally set error state or show a toast
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
