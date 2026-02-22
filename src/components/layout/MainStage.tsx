@@ -7,7 +7,7 @@ interface MainStageProps {
 
 export function MainStage({ children }: MainStageProps) {
     return (
-        <div className="h-screen bg-[#1E1B4B]/5 p-0 sm:p-4 md:p-6 pt-0 md:pt-0 flex items-stretch overflow-hidden">
+        <div className="h-screen bg-[#1E1B4B]/5 p-4 md:p-8 flex items-center justify-center overflow-hidden">
             {/* Global Split Background (Reflects Hero style throughout) */}
             <div className="fixed inset-0 flex pointer-events-none z-0">
                 <div className="flex-[1.2] bg-[#f9e8d4]" />
