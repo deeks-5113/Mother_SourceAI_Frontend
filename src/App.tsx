@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useEngine } from '@/hooks/useEngine'
 import { AuroraHero } from '@/components/hero/AuroraHero'
 import { FeatureBentoGrid } from '@/components/sections/FeatureBentoGrid'
-import { SpecialistsCarousel } from '@/components/sections/SpecialistsCarousel'
+import { ProblemSolution } from '@/components/sections/ProblemSolution'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { FilterPanel } from '@/components/layout/FilterPanel'
 import { EntityCard } from '@/components/cards/EntityCard'
@@ -12,9 +12,8 @@ import { MainStage } from '@/components/layout/MainStage'
 import { ImpactGrid } from '@/components/sections/ImpactGrid'
 import { FinalFooter } from '@/components/sections/FinalFooter'
 import { OutreachView } from '@/components/sections/OutreachView'
-import { Search, SlidersHorizontal, LayoutGrid, List } from 'lucide-react'
+import { Search, SlidersHorizontal } from 'lucide-react'
 import { staggerContainer, fadeSlideUp } from '@/lib/motionVariants'
-import { Button } from './components/ui/button'
 
 const fadeSlide = {
     initial: { opacity: 0, y: 20 },
@@ -34,31 +33,6 @@ function WorkspaceHeader({ title, subtitle }: { title: string; subtitle: string 
             <motion.div variants={fadeSlideUp}>
                 <h2 className="text-2xl font-black text-[#1E1B4B] tracking-tight">{title}</h2>
                 <p className="text-sm font-medium text-slate-400 mt-1">{subtitle}</p>
-            </motion.div>
-
-            <motion.div variants={fadeSlideUp} className="flex items-center gap-3">
-                <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-[#F9E8D4]/50 border border-[#1E1B4B]/5 text-[#1E1B4B]/40 text-sm focus-within:border-[#F9C784] transition-all w-full md:w-64 group shadow-sm">
-                    <Search className="w-4 h-4 group-hover:text-[#F9C784] transition-colors" />
-                    <input
-                        type="text"
-                        placeholder="Search clusters..."
-                        className="bg-transparent border-none outline-none text-[#1E1B4B] placeholder:text-[#1E1B4B]/30 w-full"
-                    />
-                </div>
-
-                <div className="flex bg-[#F9E8D4]/50 border border-[#1E1B4B]/5 p-1 rounded-xl shadow-sm">
-                    <button className="p-2 rounded-lg bg-[#F9C784] text-[#1E1B4B] shadow-sm">
-                        <LayoutGrid className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 rounded-lg text-[#1E1B4B]/40 hover:text-[#1E1B4B]">
-                        <List className="w-4 h-4" />
-                    </button>
-                </div>
-
-                <Button variant="outline" className="border-[#1E1B4B]/10 text-[#1E1B4B]/60 gap-2 h-11 px-4 rounded-xl hover:bg-[#F9E8D4]/50">
-                    <SlidersHorizontal className="w-4 h-4" />
-                    Config
-                </Button>
             </motion.div>
         </motion.div>
     )
@@ -178,7 +152,7 @@ export default function App() {
                     >
                         <AuroraHero />
                         <FeatureBentoGrid />
-                        <SpecialistsCarousel />
+                        <ProblemSolution />
                         <ImpactGrid />
                         <FinalFooter />
                     </motion.div>
