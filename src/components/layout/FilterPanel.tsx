@@ -181,7 +181,7 @@ export function FilterPanel() {
             {/* Search Trigger */}
             <div className="shrink-0 pt-2">
                 <Button
-                    onClick={() => triggerSearch('channels')}
+                    onClick={() => triggerSearch(currentView === 'funding' ? 'partners' : 'channels')}
                     className="w-full bg-[#F9C784] hover:bg-[#f9d4a1] text-[#1E1B4B] font-black text-[11px] h-11 rounded-2xl shadow-lg shadow-[#F9C784]/20 cursor-pointer"
                     size="sm"
                 >
