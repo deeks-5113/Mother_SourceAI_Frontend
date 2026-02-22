@@ -35,21 +35,21 @@ export function ProgressiveLoader() {
                     <motion.div
                         key={i}
                         variants={fadeSlideUp}
-                        className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 space-y-6 shadow-sm"
+                        className="rounded-2xl border border-[#1E1B4B]/5 bg-[#F9E8D4]/10 p-6 space-y-6 shadow-sm"
                     >
                         <div className="flex items-start justify-between">
                             <div className="space-y-3 flex-1">
-                                <Skeleton className="h-5 w-3/4 bg-slate-800" />
-                                <Skeleton className="h-3 w-1/2 bg-slate-800" />
+                                <Skeleton className="h-5 w-3/4 bg-[#1E1B4B]/10" />
+                                <Skeleton className="h-3 w-1/2 bg-[#1E1B4B]/10" />
                             </div>
-                            <Skeleton className="w-12 h-12 rounded-full bg-slate-800" />
+                            <Skeleton className="w-12 h-12 rounded-full bg-[#1E1B4B]/10" />
                         </div>
                         <div className="space-y-3">
-                            <Skeleton className="h-3 w-full bg-slate-800" />
-                            <Skeleton className="h-3 w-5/6 bg-slate-800 opacity-60" />
+                            <Skeleton className="h-3 w-full bg-[#1E1B4B]/10" />
+                            <Skeleton className="h-3 w-5/6 bg-[#1E1B4B]/10 opacity-60" />
                         </div>
-                        <div className="pt-4 border-t border-slate-800">
-                            <Skeleton className="h-12 w-full rounded-xl bg-slate-800/50" />
+                        <div className="pt-4 border-t border-[#1E1B4B]/5">
+                            <Skeleton className="h-12 w-full rounded-xl bg-[#1E1B4B]/5" />
                         </div>
                     </motion.div>
                 ))}
@@ -57,16 +57,16 @@ export function ProgressiveLoader() {
 
             {/* Cycling text */}
             <div className="flex items-center justify-center py-4">
-                <div className="flex items-center gap-3 bg-slate-900/80 px-6 py-3 rounded-2xl border border-slate-800 shadow-xl">
+                <div className="flex items-center gap-3 bg-[#1E1B4B] px-6 py-3 rounded-2xl border border-[#1E1B4B]/10 shadow-xl">
                     <motion.div
-                        className="w-2 h-2 rounded-full bg-teal-500 shadow-[0_0_10px_rgba(20,184,166,0.5)]"
+                        className="w-2 h-2 rounded-full bg-[#F9C784] shadow-[0_0_10px_rgba(249,199,132,0.5)]"
                         animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
                         transition={{ duration: 1.5, repeat: Infinity }}
                     />
                     <AnimatePresence mode="wait">
                         <motion.p
                             key={phraseIndex}
-                            className="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono"
+                            className="text-xs font-bold text-white/80 uppercase tracking-widest font-mono"
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}

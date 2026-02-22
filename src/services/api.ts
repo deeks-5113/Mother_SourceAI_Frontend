@@ -25,6 +25,22 @@ export interface SearchRequest {
     specific_need: string;
 }
 
+export interface OutreachRequest {
+    entity_id: string;
+    pilot_description: string;
+    sender_name: string;
+    tone: 'warm' | 'professional';
+    channel: 'email' | 'whatsapp' | 'phone_script' | 'linkedin' | 'concept_note';
+    recipient_name?: string;
+    recipient_role?: string;
+}
+
+export interface OutreachResponse {
+    subject_line: string;
+    message_content: string;
+    missing_variables: string[];
+}
+
 export const apiService = {
     async searchChannels(request: SearchRequest): Promise<Entity[]> {
         try {
@@ -59,6 +75,28 @@ export const apiService = {
             }));
         } catch (error) {
             console.error("Failed to fetch channels:", error);
+            throw error;
+        }
+    },
+
+    async generateOutreach(request: OutreachRequest): Promise<OutreachResponse> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/outreach/draft`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(request),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || `Outreach API Error: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Outreach generation failed:", error);
             throw error;
         }
     },
