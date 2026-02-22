@@ -106,6 +106,27 @@ export function EngineProvider({ children }: { children: ReactNode }) {
                 } catch (apiError) {
                     console.warn("Backend API unavailable, falling back to mock data:", apiError);
                 }
+            } else if (type === 'partners') {
+                try {
+                    const target_region = filters.districts || 'Tirupati';
+                    const project_goal = filters.specificNeed || 'AI-driven maternal nutrition pilot for rural mothers';
+
+                    // Field rules: target_region min 2, project_goal min 10
+                    if (target_region.length >= 2 && project_goal.length >= 10) {
+                        const responseResults = await apiService.searchPartners({
+                            target_region,
+                            project_goal
+                        });
+
+                        if (responseResults && responseResults.length > 0) {
+                            setResults(responseResults);
+                            setIsLoading(false);
+                            return;
+                        }
+                    }
+                } catch (apiError) {
+                    console.warn("Partner API unavailable, falling back to mock data:", apiError);
+                }
             }
 
             // Fallback: Mock Data filtering
