@@ -1,10 +1,20 @@
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, createContext, useContext, useCallback } from 'react';
 import type { ReactNode, Dispatch, SetStateAction } from 'react';
 import { type Entity, mockEntities } from '../data/mockData';
 import { apiService } from '../services/api';
+import type { DispatchSessionSummary } from '../services/api';
 
 // Define the possible views for our State-Driven SPA
 type View = 'hero' | 'home' | 'outreach' | 'funding' | 'admin';
+
+export interface OutreachThread {
+    id: string;
+    entity_id: string;
+    entity_name: string;
+    channel: string;
+    created_at: string;
+    updated_at: string;
+}
 
 interface EngineContextType {
     currentView: View;
@@ -40,24 +50,19 @@ interface EngineContextType {
     } | null;
     isGenerating: boolean;
     handleGenerateOutreach: () => Promise<void>;
-    // Thread Persistence
+    // Thread Persistence (API-backed)
     threads: OutreachThread[];
     activeThreadId: string | null;
-    saveCurrentThread: () => void;
-    loadThread: (id: string) => void;
-    createNewThread: () => void;
     messages: { role: 'user' | 'ai'; content: string; timestamp: Date }[];
     setMessages: Dispatch<SetStateAction<{ role: 'user' | 'ai'; content: string; timestamp: Date }[]>>;
-}
-
-export interface OutreachThread {
-    id: string;
-    title: string;
-    timestamp: Date;
-    entity: Entity | null;
-    meta: EngineContextType['outreachMeta'];
-    draft: EngineContextType['generatedDraft'];
-    messages: { role: 'user' | 'ai'; content: string; timestamp: Date }[];
+    isDispatching: boolean;
+    isSendingChat: boolean;
+    dispatchToOutreach: () => Promise<void>;
+    sendChatMessage: (text: string) => Promise<void>;
+    fetchThreads: () => Promise<void>;
+    loadThread: (id: string) => Promise<void>;
+    deleteThread: (id: string) => Promise<void>;
+    createNewThread: () => void;
 }
 
 const EngineContext = createContext<EngineContextType | undefined>(undefined);
@@ -77,14 +82,13 @@ export function EngineProvider({ children }: { children: ReactNode }) {
         specificNeed: ''
     });
 
-    // The "Judge-Winning" Search Trigger
+    // The Search Trigger
     const triggerSearch = async (type: 'channels' | 'partners') => {
         setIsLoading(true);
 
         try {
             if (type === 'channels') {
                 try {
-                    // Map frontend filters to backend request
                     const district = filters.districts || 'Hyderabad';
                     const demographic = (filters.environment.charAt(0).toUpperCase() + filters.environment.slice(1)) as 'Urban' | 'Rural';
 
@@ -104,7 +108,7 @@ export function EngineProvider({ children }: { children: ReactNode }) {
                 }
             }
 
-            // Fallback: Simulation / Mock Data filtering (the "usual" behavior)
+            // Fallback: Mock Data filtering
             await new Promise((resolve) => setTimeout(resolve, 2000));
             const filtered = mockEntities.filter(e => {
                 const env = e.ruralUrban.toLowerCase() === filters.environment;
@@ -112,7 +116,6 @@ export function EngineProvider({ children }: { children: ReactNode }) {
                 return env && distSet;
             });
 
-            // Ensure we show at least some results in mock mode for empty filters
             setResults(filtered.length > 0 ? filtered : mockEntities.slice(0, 4));
 
         } catch (error) {
@@ -164,66 +167,161 @@ export function EngineProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    // --- Thread Persistence ---
-    const [threads, setThreads] = useState<OutreachThread[]>(() => {
-        const saved = localStorage.getItem('mother_source_threads');
-        return saved ? JSON.parse(saved) : [];
-    });
+    // --- Thread Persistence (API-backed) ---
+    const [threads, setThreads] = useState<OutreachThread[]>([]);
     const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
-    const [messages, setMessages] = useState<{ role: 'user' | 'ai'; content: string; timestamp: Date }[]>([
-        {
-            role: 'ai',
-            content: "Protocol initiated. I've architected the outreach draft based on your clinical parameters. I'm ready to refine the strategy or adjust the tone. What would you like to achieve next?",
-            timestamp: new Date()
-        }
-    ]);
+    const [messages, setMessages] = useState<{ role: 'user' | 'ai'; content: string; timestamp: Date }[]>([]);
+    const [isDispatching, setIsDispatching] = useState(false);
+    const [isSendingChat, setIsSendingChat] = useState(false);
 
-    const saveCurrentThread = () => {
+    // Dispatch: Create a brainstorm session from the current outreach draft
+    const dispatchToOutreach = useCallback(async () => {
         if (!selectedEntity || !generatedDraft) return;
 
-        const newThread: OutreachThread = {
-            id: activeThreadId || Date.now().toString(),
-            title: outreachMeta.recipientName || selectedEntity.name,
-            timestamp: new Date(),
-            entity: selectedEntity,
-            meta: outreachMeta,
-            draft: generatedDraft,
-            messages: messages
-        };
+        setIsDispatching(true);
+        try {
+            const response = await apiService.createDispatchSession({
+                entity_id: selectedEntity.id,
+                entity_name: selectedEntity.name,
+                pilot_description: selectedEntity.content || "MotherSource AI Maternal Health Initiative",
+                channel: outreachMeta.channel,
+                outreach_subject: generatedDraft.subject,
+                outreach_body: generatedDraft.content,
+            });
 
-        if (activeThreadId) {
-            setThreads(prev => prev.map(t => t.id === activeThreadId ? newThread : t));
-        } else {
+            setActiveThreadId(response.session_id);
+            setMessages([
+                { role: 'ai', content: response.seed_message, timestamp: new Date() }
+            ]);
+
+            // Add to local threads list immediately
+            const newThread: OutreachThread = {
+                id: response.session_id,
+                entity_id: selectedEntity.id,
+                entity_name: selectedEntity.name,
+                channel: outreachMeta.channel,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            };
             setThreads(prev => [newThread, ...prev]);
-            setActiveThreadId(newThread.id);
-        }
-
-        localStorage.setItem('mother_source_threads', JSON.stringify([newThread, ...threads.filter(t => t.id !== newThread.id)]));
-    };
-
-    const loadThread = (id: string) => {
-        const thread = threads.find(t => t.id === id);
-        if (thread) {
-            setSelectedEntity(thread.entity);
-            setOutreachMeta(thread.meta);
-            setGeneratedDraft(thread.draft);
-            setMessages(thread.messages.map(m => ({ ...m, timestamp: new Date(m.timestamp) }))); // Ensure Date objects
-            setActiveThreadId(id);
             setCurrentView('outreach');
+        } catch (error) {
+            console.error("Dispatch failed, using local fallback:", error);
+            // Fallback: create a local-only thread
+            const fallbackId = Date.now().toString();
+            setActiveThreadId(fallbackId);
+            setMessages([
+                {
+                    role: 'ai',
+                    content: `I've reviewed the outreach draft for ${selectedEntity.name}. The ${outreachMeta.channel} strategy looks solid. How would you like to refine it?`,
+                    timestamp: new Date()
+                }
+            ]);
+            const fallbackThread: OutreachThread = {
+                id: fallbackId,
+                entity_id: selectedEntity.id,
+                entity_name: selectedEntity.name,
+                channel: outreachMeta.channel,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            };
+            setThreads(prev => [fallbackThread, ...prev]);
+            setCurrentView('outreach');
+        } finally {
+            setIsDispatching(false);
         }
-    };
+    }, [selectedEntity, generatedDraft, outreachMeta]);
 
+    // Send a chat message in the active brainstorm session
+    const sendChatMessage = useCallback(async (text: string) => {
+        if (!activeThreadId || !text.trim()) return;
+
+        // Immediately add user message
+        const userMsg = { role: 'user' as const, content: text, timestamp: new Date() };
+        setMessages(prev => [...prev, userMsg]);
+        setIsSendingChat(true);
+
+        try {
+            const response = await apiService.sendDispatchChat(activeThreadId, text);
+            setMessages(prev => [...prev, { role: 'ai', content: response.reply, timestamp: new Date() }]);
+        } catch (error) {
+            console.error("Chat failed, using fallback:", error);
+            // Fallback: simulated response
+            const fallbackResponses = [
+                "Strategy refinement complete. I've adjusted the messaging to better align with the recipient's role.",
+                "Optimizing metadata for higher resonance. Would you like to see a variant focused on community impact?",
+                "Analyzing response patterns... I've added a stronger call-to-action focused on a pilot introduction.",
+            ];
+            setMessages(prev => [...prev, {
+                role: 'ai',
+                content: fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)],
+                timestamp: new Date()
+            }]);
+        } finally {
+            setIsSendingChat(false);
+        }
+    }, [activeThreadId]);
+
+    // Fetch all threads from the backend
+    const fetchThreads = useCallback(async () => {
+        try {
+            const sessions = await apiService.listDispatchSessions();
+            setThreads(sessions.map((s: DispatchSessionSummary) => ({
+                id: s.id,
+                entity_id: s.entity_id,
+                entity_name: s.entity_name,
+                channel: s.channel,
+                created_at: s.created_at,
+                updated_at: s.updated_at,
+            })));
+        } catch (error) {
+            console.error("Failed to fetch threads:", error);
+        }
+    }, []);
+
+    // Load/resume a specific thread from the backend
+    const loadThread = useCallback(async (id: string) => {
+        setActiveThreadId(id);
+        try {
+            const session = await apiService.getDispatchSession(id);
+            setMessages(session.messages.map(m => ({
+                role: m.role === 'assistant' ? 'ai' as const : 'user' as const,
+                content: m.content,
+                timestamp: new Date(),
+            })));
+            // Restore entity context from session
+            setGeneratedDraft({
+                subject: session.outreach_draft.subject,
+                content: session.outreach_draft.body,
+                missing: [],
+            });
+        } catch (error) {
+            console.error("Failed to load thread:", error);
+            setMessages([{ role: 'ai', content: "Failed to resume this session. The backend may be unavailable.", timestamp: new Date() }]);
+        }
+    }, []);
+
+    // Delete a thread
+    const deleteThread = useCallback(async (id: string) => {
+        try {
+            await apiService.deleteDispatchSession(id);
+            setThreads(prev => prev.filter(t => t.id !== id));
+            if (activeThreadId === id) {
+                setActiveThreadId(null);
+                setMessages([]);
+                setGeneratedDraft(null);
+            }
+        } catch (error) {
+            console.error("Failed to delete thread:", error);
+        }
+    }, [activeThreadId]);
+
+    // Reset for new thread
     const createNewThread = () => {
         setSelectedEntity(null);
         setGeneratedDraft(null);
         setActiveThreadId(null);
-        setMessages([
-            {
-                role: 'ai',
-                content: "Protocol initiated. I've architected the outreach draft based on your clinical parameters. I'm ready to refine the strategy or adjust the tone. What would you like to achieve next?",
-                timestamp: new Date()
-            }
-        ]);
+        setMessages([]);
         setOutreachMeta({
             channel: 'email',
             tone: 'professional',
@@ -253,11 +351,16 @@ export function EngineProvider({ children }: { children: ReactNode }) {
                 handleGenerateOutreach,
                 threads,
                 activeThreadId,
-                saveCurrentThread,
-                loadThread,
-                createNewThread,
                 messages,
                 setMessages,
+                isDispatching,
+                isSendingChat,
+                dispatchToOutreach,
+                sendChatMessage,
+                fetchThreads,
+                loadThread,
+                deleteThread,
+                createNewThread,
             }}
         >
             {children}
@@ -272,3 +375,4 @@ export const useEngine = () => {
     }
     return context;
 };
+

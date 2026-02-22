@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { useEngine } from '@/hooks/useEngine'
 import { TrustMarquee } from '../sections/TrustMarquee'
-import AnimatedBubble from '../animations/AnimatedBubble'
+
 
 export function AuroraHero() {
     const { setCurrentView, setIsLoading } = useEngine()
@@ -123,7 +123,13 @@ export function AuroraHero() {
 
             {/* RIGHT SIDE - 50% split */}
             <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-0 relative z-10 min-h-[500px] lg:min-h-0">
-                <AnimatedBubble />
+                <div className="relative w-[400px] h-[400px] lg:w-[600px] lg:h-[600px] float-bubble">
+                    <img
+                        src="/images/mother-child.jpg"
+                        alt="Mother joyfully lifting her child"
+                        className="w-full h-full object-cover rounded-[3rem] shadow-2xl shadow-[#1E1B4B]/10 border-2 border-white"
+                    />
+                </div>
             </div>
 
             {/* Integrated Trust Marquee (Positioned higher to show others sooner) */}

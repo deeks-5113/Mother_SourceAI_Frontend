@@ -133,7 +133,7 @@ function Workspace() {
     const { currentView } = useEngine()
 
     return (
-        <div className="flex-1 overflow-y-auto bg-white">
+        <div className={`flex-1 bg-white ${currentView === 'outreach' ? 'overflow-hidden' : 'overflow-y-auto hide-scrollbar'}`}>
             <AnimatePresence mode="wait">
                 {currentView === 'home' && (
                     <motion.div key="home" {...fadeSlide} className="min-h-full flex flex-col">
@@ -142,7 +142,7 @@ function Workspace() {
                 )}
 
                 {currentView === 'outreach' && (
-                    <motion.div key="outreach" {...fadeSlide} className="h-full">
+                    <motion.div key="outreach" {...fadeSlide} className="h-full overflow-hidden">
                         <OutreachView />
                     </motion.div>
                 )}
@@ -171,7 +171,7 @@ export default function App() {
                 {currentView === 'hero' ? (
                     <motion.div
                         key="hero-scroll"
-                        className="flex-1 overflow-y-auto hide-scrollbar"
+                        className="flex-1 overflow-y-auto"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}

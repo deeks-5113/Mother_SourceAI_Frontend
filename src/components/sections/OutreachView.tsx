@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useEngine } from '@/hooks/useEngine'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Sparkles, MessageSquare, Mail, Phone, Share2, FileText, User, Bot, Plus, Settings, Save, GripVertical } from 'lucide-react'
+import { Send, Sparkles, MessageSquare, Mail, Phone, Share2, FileText, User, Bot, Plus, Settings, GripVertical, Trash2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Textarea } from '../ui/textarea'
 import { Badge } from '../ui/badge'
@@ -18,14 +18,15 @@ export function OutreachView() {
         threads,
         activeThreadId,
         loadThread,
-        saveCurrentThread,
+        deleteThread,
         createNewThread,
+        fetchThreads,
+        sendChatMessage,
+        isSendingChat,
         messages,
-        setMessages
     } = useEngine()
 
     const [inputValue, setInputValue] = useState('')
-    const [isTyping, setIsTyping] = useState(false)
     const chatEndRef = useRef<HTMLDivElement>(null)
 
     const scrollToBottom = () => {
@@ -34,41 +35,18 @@ export function OutreachView() {
 
     useEffect(() => {
         scrollToBottom()
-    }, [messages, isTyping])
+    }, [messages, isSendingChat])
+
+    // Fetch threads from the backend when entering the outreach view
+    useEffect(() => {
+        fetchThreads()
+    }, [fetchThreads])
 
     const handleSendMessage = (text?: string) => {
         const messageText = text || inputValue
         if (!messageText.trim()) return
-
-        const userMsg = { role: 'user' as const, content: messageText, timestamp: new Date() }
-        setMessages(prev => [...prev, userMsg])
         setInputValue('')
-        setIsTyping(true)
-
-        // Simulate AI response with context awareness
-        setTimeout(() => {
-            let aiResponse = ""
-            const lowerText = messageText.toLowerCase()
-
-            if (lowerText.includes('warm') || lowerText.includes('style')) {
-                aiResponse = "Acknowledged. I'm softening the opening and emphasizing the collaborative nature of this partnership to increase trust."
-            } else if (lowerText.includes('clinical') || lowerText.includes('data')) {
-                aiResponse = "Refining strategy to prioritize clinical outcome projections and district-level health metrics."
-            } else if (lowerText.includes('follow-up')) {
-                aiResponse = "I've structured a 3-step follow-up sequence optimized for this channel's typical response latency."
-            } else {
-                const responses = [
-                    "Strategy refinement complete. I've adjusted the messaging to better align with the recipient's role.",
-                    "Optimizing metadata for higher resonance. Would you like to see a variant focused on community impact?",
-                    "Payload stabilized. I recommend deploying this version to test local engagement levels.",
-                    "Analyzing response patterns... I've added a stronger call-to-action focused on a pilot introduction."
-                ]
-                aiResponse = responses[Math.floor(Math.random() * responses.length)]
-            }
-
-            setMessages(prev => [...prev, { role: 'ai', content: aiResponse, timestamp: new Date() }])
-            setIsTyping(false)
-        }, 1200)
+        sendChatMessage(messageText)
     }
 
     const suggestedActions = [
@@ -93,7 +71,7 @@ export function OutreachView() {
             initial="initial"
             animate="animate"
         >
-            {/* Thread History Sidebar (The "ChatGPT" Style) */}
+            {/* Thread History Sidebar */}
             <div className="w-80 flex flex-col bg-[#1E1B4B] text-white/90 border-r border-white/5 overflow-hidden">
                 <div className="p-6 space-y-4">
                     <Button
@@ -116,34 +94,50 @@ export function OutreachView() {
                                 </div>
                             )}
                             {threads.map(thread => (
-                                <button
+                                <div
                                     key={thread.id}
-                                    onClick={() => loadThread(thread.id)}
                                     className={`w-full p-4 rounded-2xl text-left border transition-all group relative overflow-hidden ${activeThreadId === thread.id
                                         ? 'bg-[#F9C784] border-[#F9C784] text-[#1E1B4B]'
                                         : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10 text-white/70'
                                         }`}
                                 >
-                                    <div className="flex flex-col gap-1 relative z-10">
-                                        <div className="flex items-center justify-between gap-2">
-                                            <span className="text-[11px] font-black uppercase tracking-tight truncate flex-1">{thread.title}</span>
-                                            <span className="text-[8px] font-black opacity-40">{new Date(thread.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
+                                    <button
+                                        onClick={() => loadThread(thread.id)}
+                                        className="w-full text-left"
+                                    >
+                                        <div className="flex flex-col gap-1 relative z-10">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className="text-[11px] font-black uppercase tracking-tight truncate flex-1">{thread.entity_name}</span>
+                                                <span className="text-[8px] font-black opacity-40">{new Date(thread.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Badge className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md ${activeThreadId === thread.id ? 'bg-[#1E1B4B]/10 text-[#1E1B4B]' : 'bg-white/10 text-white/50'
+                                                    }`}>
+                                                    {thread.channel}
+                                                </Badge>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <Badge className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md ${activeThreadId === thread.id ? 'bg-[#1E1B4B]/10 text-[#1E1B4B]' : 'bg-white/10 text-white/50'
-                                                }`}>
-                                                {thread.meta.channel}
-                                            </Badge>
-                                            <span className="text-[9px] font-bold opacity-40 truncate">{thread.entity?.name}</span>
-                                        </div>
-                                    </div>
+                                    </button>
+                                    {/* Delete button */}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            deleteThread(thread.id)
+                                        }}
+                                        className={`absolute top-3 right-3 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all z-20 ${activeThreadId === thread.id
+                                            ? 'hover:bg-[#1E1B4B]/10 text-[#1E1B4B]/60 hover:text-red-600'
+                                            : 'hover:bg-white/10 text-white/30 hover:text-red-400'
+                                            }`}
+                                    >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
                                     {activeThreadId === thread.id && (
                                         <motion.div
                                             layoutId="active-thread-glow"
                                             className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
                                         />
                                     )}
-                                </button>
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -163,10 +157,10 @@ export function OutreachView() {
                 </div>
             </div>
 
-            {/* Middle Section: Intelligence Hub (Condensed) */}
+            {/* Middle Section: Intelligence Hub */}
             <div className="lg:w-[380px] xl:w-[420px] flex flex-col border-r border-[#1E1B4B]/5 overflow-hidden bg-slate-50/50">
-                <div className="p-8 lg:p-10 pb-12 w-full flex flex-col justify-end min-h-full space-y-8 overflow-y-auto hide-scrollbar">
-                    {!selectedEntity || !generatedDraft ? (
+                <div className="flex-1 p-8 lg:p-10 pb-12 w-full flex flex-col justify-end space-y-8 overflow-y-auto hide-scrollbar">
+                    {!activeThreadId || !generatedDraft ? (
                         <motion.div
                             variants={fadeSlideUp}
                             className="h-full flex flex-col items-center justify-center p-12 text-center"
@@ -198,7 +192,7 @@ export function OutreachView() {
                                             <GripVertical className="w-5 h-5 text-slate-300" />
                                         </div>
                                         <Badge className="bg-[#1E1B4B] text-white text-[9px] uppercase font-black px-3 py-1 rounded-lg tracking-widest">ACTIVE PROTOCOL</Badge>
-                                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">SID: {activeThreadId || 'UNSAVED'}</span>
+                                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">SID: {activeThreadId?.slice(0, 8) || 'N/A'}</span>
                                     </div>
                                     <div className="flex items-center gap-1.5">
                                         <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
@@ -226,7 +220,7 @@ export function OutreachView() {
                                     <div className="space-y-4 flex-1">
                                         <div className="flex flex-col gap-1">
                                             <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Recipient Identity</span>
-                                            <h4 className="text-3xl font-black text-[#1E1B4B] tracking-tight leading-tight block">{selectedEntity.name}</h4>
+                                            <h4 className="text-3xl font-black text-[#1E1B4B] tracking-tight leading-tight block">{selectedEntity?.name || 'Entity'}</h4>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <Badge variant="outline" className="text-[10px] font-black text-[#F9C784] border-[#F9C784]/30 bg-[#F9C784]/5 uppercase tracking-widest px-4 py-1.5 rounded-xl font-mono">
@@ -258,16 +252,7 @@ export function OutreachView() {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-between pt-10 border-t border-slate-100">
-                                    <div className="flex items-center gap-5">
-                                        <Button
-                                            onClick={saveCurrentThread}
-                                            className="bg-[#F9C784] text-[#1E1B4B] h-12 px-8 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-[#F9C784]/20 hover:scale-[1.02] transition-all flex items-center gap-2"
-                                        >
-                                            <Save className="w-4 h-4" />
-                                            Save Strategy
-                                        </Button>
-                                    </div>
+                                <div className="flex items-center justify-end pt-10 border-t border-slate-100">
                                     <Button
                                         onClick={handleGenerateOutreach}
                                         disabled={isSyncing}
@@ -282,7 +267,7 @@ export function OutreachView() {
                 </div>
             </div>
 
-            {/* Right Section: Strategic Refinement Thread (Hero Focus) */}
+            {/* Right Section: Strategic Refinement Thread */}
             <div className="flex-1 flex flex-col bg-white border-l border-[#1E1B4B]/5 relative">
                 <div className="p-8 lg:p-10 pb-6 border-b border-[#1E1B4B]/5 bg-white z-20">
                     <div className="flex items-center justify-between mb-4">
@@ -301,7 +286,8 @@ export function OutreachView() {
                             <button
                                 key={action}
                                 onClick={() => handleSendMessage(action)}
-                                className="flex-shrink-0 px-4 py-1.5 rounded-full border border-slate-100 bg-slate-50 text-[10px] font-bold text-slate-500 hover:border-[#F9C784] hover:text-[#1E1B4B] hover:bg-[#F9E8D4]/30 transition-all active:scale-95"
+                                disabled={!activeThreadId || isSendingChat}
+                                className="flex-shrink-0 px-4 py-1.5 rounded-full border border-slate-100 bg-slate-50 text-[10px] font-bold text-slate-500 hover:border-[#F9C784] hover:text-[#1E1B4B] hover:bg-[#F9E8D4]/30 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                                 {action}
                             </button>
@@ -310,6 +296,15 @@ export function OutreachView() {
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-8 lg:p-10 space-y-10 scroll-smooth bg-slate-50/30">
+                    {messages.length === 0 && !activeThreadId && (
+                        <div className="h-full flex flex-col items-center justify-center text-center p-12">
+                            <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-6">
+                                <MessageSquare className="w-7 h-7 text-slate-300" />
+                            </div>
+                            <p className="text-sm font-bold text-slate-400">Dispatch a strategy to start brainstorming</p>
+                            <p className="text-xs text-slate-300 mt-2">Select an entity → Generate outreach → Click Dispatch</p>
+                        </div>
+                    )}
                     <AnimatePresence initial={false}>
                         {messages.map((msg, idx) => (
                             <motion.div
@@ -335,7 +330,7 @@ export function OutreachView() {
                                 </div>
                             </motion.div>
                         ))}
-                        {isTyping && (
+                        {isSendingChat && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-5">
                                 <div className="w-12 h-12 rounded-[1.25rem] bg-[#1E1B4B] text-white flex items-center justify-center flex-shrink-0 shadow-md">
                                     <Bot className="w-6 h-6 animate-pulse" />
@@ -357,7 +352,7 @@ export function OutreachView() {
                 <div className="p-8 lg:p-10 border-t border-[#1E1B4B]/5 bg-white shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
                     <div className="relative group">
                         <Textarea
-                            placeholder="Type a clinical instruction or strategy prompt..."
+                            placeholder={activeThreadId ? "Type a clinical instruction or strategy prompt..." : "Dispatch a strategy first to start chatting..."}
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={(e) => {
@@ -366,11 +361,12 @@ export function OutreachView() {
                                     handleSendMessage()
                                 }
                             }}
-                            className="min-h-[110px] w-full bg-slate-50 border-slate-100 rounded-[2.5rem] p-7 pr-20 text-sm font-medium focus:border-[#F9C784]/50 focus:bg-white transition-all resize-none shadow-inner"
+                            disabled={!activeThreadId}
+                            className="min-h-[110px] w-full bg-slate-50 border-slate-100 rounded-[2.5rem] p-7 pr-20 text-sm font-medium focus:border-[#F9C784]/50 focus:bg-white transition-all resize-none shadow-inner disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                         <button
                             onClick={() => handleSendMessage()}
-                            disabled={!inputValue.trim() || isTyping}
+                            disabled={!inputValue.trim() || isSendingChat || !activeThreadId}
                             className="absolute bottom-5 right-5 w-12 h-12 rounded-[1.25rem] bg-[#1E1B4B] text-white flex items-center justify-center hover:bg-[#2e2a70] disabled:opacity-20 transition-all shadow-xl shadow-[#1E1B4B]/10 active:scale-90"
                         >
                             <Send className="w-5 h-5" />

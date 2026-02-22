@@ -18,7 +18,7 @@ import { useState } from 'react'
 import { springTransition, fadeSlideUp } from '@/lib/motionVariants'
 
 export function OutreachCopilot() {
-    const { selectedEntity, setSelectedEntity, outreachMeta, setOutreachMeta, generatedDraft, isGenerating, handleGenerateOutreach, setCurrentView } = useEngine()
+    const { selectedEntity, setSelectedEntity, outreachMeta, setOutreachMeta, generatedDraft, isGenerating, handleGenerateOutreach, dispatchToOutreach, isDispatching } = useEngine()
     const [copied, setCopied] = useState(false)
 
     const isOpen = selectedEntity !== null
@@ -288,14 +288,14 @@ export function OutreachCopilot() {
                             </Button>
                             <Button
                                 onClick={() => {
-                                    setCurrentView('outreach')
+                                    dispatchToOutreach()
                                     handleOpenChange(false)
                                 }}
-                                disabled={!generatedDraft || isGenerating}
+                                disabled={!generatedDraft || isGenerating || isDispatching}
                                 className="flex-1 h-12 bg-[#F9C784] hover:bg-[#f9d4a1] text-[#1E1B4B] font-black uppercase text-[11px] tracking-widest rounded-2xl shadow-lg shadow-[#F9C784]/20 transition-all active:scale-[0.98]"
                             >
                                 <Send className="w-4 h-4 mr-2" />
-                                Dispatch
+                                {isDispatching ? 'Dispatching...' : 'Dispatch'}
                             </Button>
                         </SheetFooter>
                     </motion.div>

@@ -41,6 +41,47 @@ export interface OutreachResponse {
     missing_variables: string[];
 }
 
+// --- Dispatch Brainstorm Service Types ---
+export interface DispatchCreateRequest {
+    entity_id: string;
+    entity_name: string;
+    pilot_description: string;
+    channel: string;
+    outreach_subject: string;
+    outreach_body: string;
+}
+
+export interface DispatchCreateResponse {
+    session_id: string;
+    seed_message: string;
+}
+
+export interface DispatchChatResponse {
+    session_id: string;
+    reply: string;
+}
+
+export interface DispatchSession {
+    session_id: string;
+    entity_id: string;
+    entity_name: string;
+    pilot_description: string;
+    channel: string;
+    outreach_draft: { subject: string; body: string };
+    messages: { role: 'assistant' | 'user'; content: string }[];
+    created_at: string;
+    updated_at: string;
+}
+
+export interface DispatchSessionSummary {
+    id: string;
+    entity_id: string;
+    entity_name: string;
+    channel: string;
+    created_at: string;
+    updated_at: string;
+}
+
 export const apiService = {
     async searchChannels(request: SearchRequest): Promise<Entity[]> {
         try {
@@ -63,12 +104,12 @@ export const apiService = {
             return data.results.map((item) => ({
                 id: item.entity_id,
                 name: item.name,
-                type: item.type as 'NGO' | 'PHC' | 'Government Scheme', // Assuming backend types match or need casting
+                type: item.type as 'NGO' | 'PHC' | 'Government Scheme',
                 district: data.district,
                 ruralUrban: data.demographic as 'Rural' | 'Urban',
                 relevance: Math.round(item.relevance_score * 100),
                 ai_reasoning: item.comparative_reasoning,
-                draftEmail: `Dear ${item.name} Team,\n\nWe are reaching out from MotherSource AI...`, // Default draft
+                draftEmail: `Dear ${item.name} Team,\n\nWe are reaching out from MotherSource AI...`,
                 rank: item.rank_position,
                 content: item.content,
                 semantic_summary: item.semantic_summary,
@@ -103,7 +144,6 @@ export const apiService = {
 
     async checkHealth(): Promise<boolean> {
         try {
-            // Health check is outside /api/v1 usually
             const baseUrl = API_BASE_URL.replace('/api/v1', '');
             const response = await fetch(`${baseUrl}/health`);
             const data = await response.json();
@@ -111,5 +151,95 @@ export const apiService = {
         } catch {
             return false;
         }
-    }
+    },
+
+    // --- Dispatch Brainstorm Service ---
+
+    async createDispatchSession(request: DispatchCreateRequest): Promise<DispatchCreateResponse> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/dispatch/create`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(request),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || `Dispatch Create Error: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Dispatch session creation failed:", error);
+            throw error;
+        }
+    },
+
+    async sendDispatchChat(sessionId: string, message: string): Promise<DispatchChatResponse> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/dispatch/${sessionId}/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || `Dispatch Chat Error: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Dispatch chat failed:", error);
+            throw error;
+        }
+    },
+
+    async getDispatchSession(sessionId: string): Promise<DispatchSession> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/dispatch/${sessionId}`);
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || `Dispatch Get Error: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Dispatch session fetch failed:", error);
+            throw error;
+        }
+    },
+
+    async deleteDispatchSession(sessionId: string): Promise<void> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/dispatch/${sessionId}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok && response.status !== 204) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || `Dispatch Delete Error: ${response.status}`);
+            }
+        } catch (error) {
+            console.error("Dispatch session deletion failed:", error);
+            throw error;
+        }
+    },
+
+    async listDispatchSessions(): Promise<DispatchSessionSummary[]> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/dispatch/`);
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || `Dispatch List Error: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Dispatch session listing failed:", error);
+            throw error;
+        }
+    },
 };
