@@ -47,7 +47,7 @@ function HomeView() {
 
     return (
         <motion.div
-            className="p-8 pb-20 max-w-[1600px] mx-auto w-full"
+            className="p-6 md:p-10 pt-10 md:pt-10 pb-20 max-w-7xl mx-auto w-full"
             variants={staggerContainer}
             initial="initial"
             animate="animate"

@@ -145,7 +145,7 @@ export function OutreachView() {
 
             {/* Right Section: Strategic Refinement Thread — Full Width */}
             <div className="flex-1 h-full flex flex-col bg-white relative overflow-hidden">
-                <div className="p-8 lg:p-10 pb-6 border-b border-[#1E1B4B]/5 bg-white z-20">
+                <div className="pt-10 p-6 lg:p-10 pb-6 border-b border-[#1E1B4B]/5 bg-white z-20">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-[#F9E8D4] rounded-lg">

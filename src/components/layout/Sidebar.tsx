@@ -19,7 +19,7 @@ export function Sidebar() {
     return (
         <motion.aside
             layout
-            className="flex flex-col items-center py-6 px-3 bg-white border-r border-[#DDD6FE]/30 w-[72px] min-h-screen"
+            className="flex flex-col items-center pt-10 pb-6 px-3 bg-white border-r border-[#DDD6FE]/30 w-[72px] h-full"
             initial={{ x: -72, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}

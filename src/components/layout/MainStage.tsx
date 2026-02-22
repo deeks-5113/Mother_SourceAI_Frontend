@@ -7,7 +7,7 @@ interface MainStageProps {
 
 export function MainStage({ children }: MainStageProps) {
     return (
-        <div className="min-h-screen bg-[#1E1B4B]/5 p-4 md:p-8 flex items-stretch overflow-hidden">
+        <div className="h-screen bg-[#1E1B4B]/5 p-0 sm:p-4 md:p-6 pt-0 md:pt-0 flex items-stretch overflow-hidden">
             {/* Global Split Background (Reflects Hero style throughout) */}
             <div className="fixed inset-0 flex pointer-events-none z-0">
                 <div className="flex-[1.2] bg-[#f9e8d4]" />
@@ -30,7 +30,7 @@ export function MainStage({ children }: MainStageProps) {
                     ease: "easeOut",
                     opacity: { duration: 0.4 }
                 }}
-                className="flex-1 rounded-[3.5rem] shadow-[0_40px_100px_-20px_rgba(30,27,75,0.2),0_10px_40px_-10px_rgba(30,27,75,0.1)] relative overflow-hidden flex flex-col z-10 border-t-2 border-t-[#F9C784] border-x border-b border-[#1E1B4B]/10"
+                className="flex-1 rounded-[2rem] shadow-[0_40px_100px_-20px_rgba(30,27,75,0.2),0_10px_40px_-10px_rgba(30,27,75,0.1)] relative overflow-hidden flex flex-col z-10 border-t-2 border-t-[#F9C784] border-x border-b border-[#1E1B4B]/10 h-full"
             >
 
                 {/* Content */}

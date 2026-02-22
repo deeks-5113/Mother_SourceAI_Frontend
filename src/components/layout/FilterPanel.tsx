@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { springTransition } from '@/lib/motionVariants'
 
 export function FilterPanel() {
-    const { filters, setFilters, triggerSearch } = useEngine()
+    const { filters, setFilters, triggerSearch, currentView } = useEngine()
     const [showAllDistricts, setShowAllDistricts] = useState(false)
     const [districtSearch, setDistrictSearch] = useState('')
 
@@ -37,7 +37,7 @@ export function FilterPanel() {
     return (
         <motion.div
             layout
-            className="w-[280px] h-screen bg-[#F9E8D4]/20 backdrop-blur-md border-r border-[#1E1B4B]/5 p-5 flex flex-col gap-5 overflow-hidden"
+            className="w-[280px] h-full bg-[#F9E8D4]/20 backdrop-blur-md border-r border-[#1E1B4B]/5 p-6 pt-10 flex flex-col gap-5 overflow-hidden"
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={springTransition}
