@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useEngine } from '@/hooks/useEngine'
 import { AuroraHero } from '@/components/hero/AuroraHero'
 import { FeatureBentoGrid } from '@/components/sections/FeatureBentoGrid'
-import { SpecialistsCarousel } from '@/components/sections/SpecialistsCarousel'
+import { ProblemSolution } from '@/components/sections/ProblemSolution'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { FilterPanel } from '@/components/layout/FilterPanel'
 import { EntityCard } from '@/components/cards/EntityCard'
@@ -178,7 +178,7 @@ export default function App() {
                     >
                         <AuroraHero />
                         <FeatureBentoGrid />
-                        <SpecialistsCarousel />
+                        <ProblemSolution />
                         <ImpactGrid />
                         <FinalFooter />
                     </motion.div>
