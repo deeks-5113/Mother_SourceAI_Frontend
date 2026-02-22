@@ -82,6 +82,26 @@ export interface DispatchSessionSummary {
     updated_at: string;
 }
 
+// --- Funding Service Types (Service 2) ---
+export type PartnerSearchRequest = {
+    target_region: string;
+    project_goal: string;
+};
+
+export type PartnerResult = {
+    ngo_id: string;
+    title: string;
+    city: string;
+    rank_position: number;
+    relevance_score: number;
+    inferred_capability: string;
+    alignment_reasoning: string;
+};
+
+export type PartnerSearchResponse = {
+    results: PartnerResult[];
+};
+
 export const apiService = {
     async searchChannels(request: SearchRequest): Promise<Entity[]> {
         try {
@@ -239,6 +259,41 @@ export const apiService = {
             return await response.json();
         } catch (error) {
             console.error("Dispatch session listing failed:", error);
+            throw error;
+        }
+    },
+
+    async searchPartners(request: PartnerSearchRequest): Promise<Entity[]> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/partners/search`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(request),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || `Partner Search Error: ${response.status}`);
+            }
+
+            const data: PartnerSearchResponse = await response.json();
+
+            // Map PartnerResult to Entity
+            return data.results.map((item) => ({
+                id: item.ngo_id,
+                name: item.title,
+                type: 'NGO' as const, // The spec says "no NGOs found", but let's be safe
+                district: item.city,
+                ruralUrban: 'Rural' as const, // Backend doesn't specify, defaulting to Rural for MotherSource context
+                relevance: Math.round(item.relevance_score * 100),
+                ai_reasoning: `Alignment: ${item.alignment_reasoning}\nCapability: ${item.inferred_capability}`,
+                draftEmail: `Dear ${item.title} Team,\n\nWe are interested in your ${item.inferred_capability}...`,
+                rank: item.rank_position,
+            }));
+        } catch (error) {
+            console.error("Partner search failed:", error);
             throw error;
         }
     },

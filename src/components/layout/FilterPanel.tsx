@@ -57,7 +57,7 @@ export function FilterPanel() {
             {/* Outreach Need */}
             <div className="space-y-3 shrink-0">
                 <div className="flex items-center justify-between group cursor-default">
-                    <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+                    <h4 className="text-[11px] font-black text-[#1E1B4B] uppercase tracking-[0.2em]">
                         Strategic Focus
                     </h4>
                     <MessageSquare className="w-3 h-3 text-slate-200 group-hover:text-[#F9C784] transition-colors" />
@@ -78,7 +78,7 @@ export function FilterPanel() {
             {/* Districts */}
             <div className="space-y-3 flex-1 overflow-hidden flex flex-col min-h-0">
                 <div className="flex items-center justify-between group cursor-default shrink-0">
-                    <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+                    <h4 className="text-[11px] font-black text-[#1E1B4B] uppercase tracking-[0.2em]">
                         Target Clusters
                     </h4>
                     <MapPin className="w-3 h-3 text-slate-200 group-hover:text-[#F9C784] transition-colors" />
@@ -149,7 +149,7 @@ export function FilterPanel() {
 
             {/* Rural / Urban Toggle */}
             <div className="space-y-3 shrink-0">
-                <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+                <h4 className="text-[11px] font-black text-[#1E1B4B] uppercase tracking-[0.2em]">
                     Demographic Wash
                 </h4>
                 <div className="flex bg-white/40 rounded-2xl p-1 border border-[#1E1B4B]/10 gap-1 shadow-sm">
@@ -186,7 +186,7 @@ export function FilterPanel() {
                     size="sm"
                 >
                     <Search className="w-4 h-4 mr-2" />
-                    Generate Architecture
+                    Launch Discovery Engine
                 </Button>
             </div>
 
