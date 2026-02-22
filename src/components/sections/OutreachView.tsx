@@ -70,7 +70,7 @@ export function OutreachView() {
 
                     <div className="flex-1 space-y-1 pt-4 overflow-hidden flex flex-col">
                         <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] pl-2 mb-4">Thread History</p>
-                        <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+                        <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
                             {threads.length === 0 && (
                                 <div className="p-6 rounded-2xl border border-dashed border-white/10 text-center space-y-3">
                                     <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center mx-auto">
