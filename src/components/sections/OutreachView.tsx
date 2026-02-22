@@ -1,20 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { useEngine } from '@/hooks/useEngine'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Sparkles, MessageSquare, Mail, Phone, Share2, FileText, User, Bot, Plus, Settings, GripVertical, Trash2 } from 'lucide-react'
+import { Send, Sparkles, MessageSquare, User, Bot, Plus, Settings, Trash2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Textarea } from '../ui/textarea'
 import { Badge } from '../ui/badge'
-import { fadeSlideUp, staggerContainer } from '@/lib/motionVariants'
+import { staggerContainer } from '@/lib/motionVariants'
 
 export function OutreachView() {
     const {
-        generatedDraft,
-        outreachMeta,
-        selectedEntity,
-        handleGenerateOutreach,
-        isGenerating: isSyncing,
-        setCurrentView,
         threads,
         activeThreadId,
         loadThread,
@@ -56,14 +50,6 @@ export function OutreachView() {
         "Shorten for mobile"
     ]
 
-    const ChannelIcon = {
-        email: Mail,
-        whatsapp: MessageSquare,
-        phone_script: Phone,
-        linkedin: Share2,
-        concept_note: FileText
-    }[outreachMeta?.channel || 'email'] || MessageSquare
-
     return (
         <motion.div
             className="flex-1 flex h-full overflow-hidden bg-white/50"
@@ -82,9 +68,9 @@ export function OutreachView() {
                         New Strategy
                     </Button>
 
-                    <div className="space-y-1 pt-4">
+                    <div className="flex-1 space-y-1 pt-4 overflow-hidden flex flex-col">
                         <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] pl-2 mb-4">Thread History</p>
-                        <div className="space-y-2 max-h-[calc(100vh-250px)] overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="flex-1 overflow-y-auto pr-2 space-y-2">
                             {threads.length === 0 && (
                                 <div className="p-6 rounded-2xl border border-dashed border-white/10 text-center space-y-3">
                                     <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center mx-auto">
@@ -157,118 +143,8 @@ export function OutreachView() {
                 </div>
             </div>
 
-            {/* Middle Section: Intelligence Hub */}
-            <div className="lg:w-[380px] xl:w-[420px] flex flex-col border-r border-[#1E1B4B]/5 overflow-hidden bg-slate-50/50">
-                <div className="flex-1 p-8 lg:p-10 pb-12 w-full flex flex-col justify-end space-y-8 overflow-y-auto hide-scrollbar">
-                    {!activeThreadId || !generatedDraft ? (
-                        <motion.div
-                            variants={fadeSlideUp}
-                            className="h-full flex flex-col items-center justify-center p-12 text-center"
-                        >
-                            <div className="w-24 h-24 rounded-[3rem] bg-[#F9E8D4] border border-[#1E1B4B]/10 flex items-center justify-center mb-8 shadow-2xl shadow-[#1E1B4B]/5">
-                                <Sparkles className="w-10 h-10 text-[#1E1B4B]" />
-                            </div>
-                            <h3 className="text-3xl font-black text-[#1E1B4B] mb-4 tracking-tight uppercase">Intelligence Hub</h3>
-                            <p className="text-slate-400 font-medium max-w-sm mb-10 text-sm leading-relaxed">
-                                Select an entity from Discovery and architect a strategy to see its clinical parameters here.
-                                <br /><br />
-                                <span className="text-[#1E1B4B] font-bold">Your threads are archived on the left for quick retrieval.</span>
-                            </p>
-                            <div className="flex gap-4">
-                                <Button
-                                    className="bg-[#1E1B4B] text-white px-10 h-14 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] shadow-xl shadow-[#1E1B4B]/20 transition-all active:scale-95"
-                                    onClick={() => setCurrentView('home')}
-                                >
-                                    Return to Discovery
-                                </Button>
-                            </div>
-                        </motion.div>
-                    ) : (
-                        <>
-                            <motion.div variants={fadeSlideUp} className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 cursor-grab active:cursor-grabbing hover:bg-slate-100 rounded-lg transition-colors">
-                                            <GripVertical className="w-5 h-5 text-slate-300" />
-                                        </div>
-                                        <Badge className="bg-[#1E1B4B] text-white text-[9px] uppercase font-black px-3 py-1 rounded-lg tracking-widest">ACTIVE PROTOCOL</Badge>
-                                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">SID: {activeThreadId?.slice(0, 8) || 'N/A'}</span>
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Synced</span>
-                                    </div>
-                                </div>
-                                <h2 className="text-4xl lg:text-6xl font-black text-[#1E1B4B] tracking-tight leading-none uppercase">
-                                    Strategy <span className="text-[#F9C784]">Hub</span>
-                                </h2>
-                                <p className="text-sm font-medium text-slate-400 max-w-md">Iterate on your clinical messaging strategy in real-time with AI-driven resonance mapping.</p>
-                            </motion.div>
-
-                            <motion.div variants={fadeSlideUp} className="bg-white border border-[#1E1B4B]/10 rounded-[3rem] p-10 lg:p-14 shadow-sm space-y-10 relative overflow-hidden group">
-                                {/* Channel Badge Overlay */}
-                                <div className="absolute top-0 right-10">
-                                    <div className="bg-[#F9C784] text-[#1E1B4B] font-black text-[9px] px-8 py-2.5 rounded-b-2xl shadow-sm uppercase tracking-[0.25em]">
-                                        {outreachMeta.channel}
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-8">
-                                    <div className="w-24 h-24 rounded-[2.5rem] bg-[#1E1B4B] flex items-center justify-center flex-shrink-0 shadow-xl shadow-[#1E1B4B]/10 group-hover:scale-105 transition-transform">
-                                        <ChannelIcon className="w-12 h-12 text-white" />
-                                    </div>
-                                    <div className="space-y-4 flex-1">
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Recipient Identity</span>
-                                            <h4 className="text-3xl font-black text-[#1E1B4B] tracking-tight leading-tight block">{selectedEntity?.name || 'Entity'}</h4>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <Badge variant="outline" className="text-[10px] font-black text-[#F9C784] border-[#F9C784]/30 bg-[#F9C784]/5 uppercase tracking-widest px-4 py-1.5 rounded-xl font-mono">
-                                                {outreachMeta.recipientRole || "Stakeholder"}
-                                            </Badge>
-                                            <Badge variant="outline" className="text-[10px] font-black text-slate-400 border-slate-200 uppercase tracking-widest px-4 py-1.5 rounded-xl">
-                                                {outreachMeta.tone} RESONANCE
-                                            </Badge>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-10 pt-4">
-                                    {generatedDraft.subject && (
-                                        <div className="p-10 bg-slate-50/50 border border-slate-100 rounded-[2.5rem] group/subject relative shadow-inner">
-                                            <div className="absolute right-8 top-8 opacity-20 group-hover/subject:opacity-100 transition-opacity">
-                                                <Sparkles className="w-5 h-5 text-[#F9C784]" />
-                                            </div>
-                                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.5em] mb-4">Architected Subject</p>
-                                            <p className="text-xl font-bold text-[#1E1B4B] leading-snug tracking-tight">{generatedDraft.subject}</p>
-                                        </div>
-                                    )}
-                                    <div className="p-12 bg-white border border-slate-100 rounded-[3rem] shadow-sm relative group/payload min-h-[300px]">
-                                        <div className="absolute -left-1 -top-1 w-32 h-32 bg-gradient-to-br from-[#F9E8D4]/30 to-transparent rounded-full blur-3xl" />
-                                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.5em] mb-8 relative">Message Payload <span className="text-[#F9C784] ml-2 text-sm">●</span></p>
-                                        <div className="text-lg text-slate-600 font-medium leading-[1.8] whitespace-pre-wrap relative">
-                                            {generatedDraft.content}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center justify-end pt-10 border-t border-slate-100">
-                                    <Button
-                                        onClick={handleGenerateOutreach}
-                                        disabled={isSyncing}
-                                        className="bg-[#1E1B4B] text-white h-12 px-8 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-[#1E1B4B]/20 hover:scale-[1.02] transition-all"
-                                    >
-                                        {isSyncing ? "Syncing..." : "Regenerate Strategy"}
-                                    </Button>
-                                </div>
-                            </motion.div>
-                        </>
-                    )}
-                </div>
-            </div>
-
-            {/* Right Section: Strategic Refinement Thread */}
-            <div className="flex-1 flex flex-col bg-white border-l border-[#1E1B4B]/5 relative">
+            {/* Right Section: Strategic Refinement Thread — Full Width */}
+            <div className="flex-1 h-full flex flex-col bg-white relative overflow-hidden">
                 <div className="p-8 lg:p-10 pb-6 border-b border-[#1E1B4B]/5 bg-white z-20">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
@@ -295,7 +171,7 @@ export function OutreachView() {
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-8 lg:p-10 space-y-10 scroll-smooth bg-slate-50/30">
+                <div className="flex-1 overflow-y-auto p-8 lg:p-10 space-y-10 scroll-smooth bg-slate-50/30 custom-scrollbar">
                     {messages.length === 0 && !activeThreadId && (
                         <div className="h-full flex flex-col items-center justify-center text-center p-12">
                             <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-6">
@@ -349,7 +225,7 @@ export function OutreachView() {
                 </div>
 
                 {/* Input Area (Pinned) */}
-                <div className="p-8 lg:p-10 border-t border-[#1E1B4B]/5 bg-white shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
+                <div className="p-4 lg:p-6 border-t border-[#1E1B4B]/5 bg-white shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
                     <div className="relative group">
                         <Textarea
                             placeholder={activeThreadId ? "Type a clinical instruction or strategy prompt..." : "Dispatch a strategy first to start chatting..."}
@@ -362,14 +238,14 @@ export function OutreachView() {
                                 }
                             }}
                             disabled={!activeThreadId}
-                            className="min-h-[110px] w-full bg-slate-50 border-slate-100 rounded-[2.5rem] p-7 pr-20 text-sm font-medium focus:border-[#F9C784]/50 focus:bg-white transition-all resize-none shadow-inner disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="min-h-[60px] w-full bg-slate-50 border-slate-100 rounded-[2rem] p-4 pr-20 text-sm font-medium focus:border-[#F9C784]/50 focus:bg-white transition-all resize-none shadow-inner disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                         <button
                             onClick={() => handleSendMessage()}
                             disabled={!inputValue.trim() || isSendingChat || !activeThreadId}
-                            className="absolute bottom-5 right-5 w-12 h-12 rounded-[1.25rem] bg-[#1E1B4B] text-white flex items-center justify-center hover:bg-[#2e2a70] disabled:opacity-20 transition-all shadow-xl shadow-[#1E1B4B]/10 active:scale-90"
+                            className="absolute bottom-3 right-5 w-10 h-10 rounded-xl bg-[#1E1B4B] text-white flex items-center justify-center hover:bg-[#2e2a70] disabled:opacity-20 transition-all shadow-xl shadow-[#1E1B4B]/10 active:scale-90"
                         >
-                            <Send className="w-5 h-5" />
+                            <Send className="w-4 h-4" />
                         </button>
                     </div>
                     <div className="flex items-center justify-center gap-4 mt-6">
