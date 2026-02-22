@@ -3,8 +3,9 @@ import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ReasoningChain } from './ReasoningChain'
 import { useEngine } from '@/hooks/useEngine'
-import { MapPin, Building2, Heart, ArrowUpRight } from 'lucide-react'
+import { MapPin, Building2, Heart, Banknote } from 'lucide-react'
 import type { Entity } from '@/data/mockData'
+import { Button } from '../ui/button'
 import { fadeSlideUp, springTransition } from '@/lib/motionVariants'
 
 interface EntityCardProps {
@@ -60,6 +61,7 @@ const typeConfig: Record<Entity['type'], { icon: typeof Heart; color: string }> 
     NGO: { icon: Heart, color: 'bg-[#F9E8D4] text-[#1E1B4B] border-[#1E1B4B]/10' },
     PHC: { icon: Building2, color: 'bg-blue-50 text-blue-700 border-blue-100' },
     'Government Scheme': { icon: Building2, color: 'bg-[#F9C784]/10 text-[#1E1B4B] border-[#F9C784]/30' },
+    Funding: { icon: Banknote, color: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
 }
 
 export function EntityCard({ entity, index }: EntityCardProps) {
@@ -107,7 +109,7 @@ export function EntityCard({ entity, index }: EntityCardProps) {
                     </div>
                     <div className="flex-shrink-0 flex flex-col items-center gap-1">
                         <CircularProgress value={entity.relevance} />
-                        <ArrowUpRight className="w-3 h-3 text-slate-300 group-hover:text-[#1E1B4B] opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0" />
+                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Confidence</span>
                     </div>
                 </CardHeader>
 
@@ -132,6 +134,11 @@ export function EntityCard({ entity, index }: EntityCardProps) {
 
                 <CardFooter className="flex flex-col items-stretch pt-0 pb-4 bg-[#F9E8D4]/5">
                     <ReasoningChain reasoning={entity.ai_reasoning} />
+                    <Button
+                        className="mt-4 w-full bg-[#1E1B4B] text-white h-10 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-[#1E1B4B]/10 hover:scale-[1.02] transition-all"
+                    >
+                        Generate Outreach Draft
+                    </Button>
                 </CardFooter>
             </Card>
         </motion.div>

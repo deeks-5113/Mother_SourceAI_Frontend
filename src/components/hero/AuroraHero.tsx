@@ -58,15 +58,15 @@ export function AuroraHero() {
                             variants={maskReveal}
                             className="text-5xl lg:text-7xl font-black text-[#1E1B4B] leading-[0.95] tracking-tighter mb-8"
                         >
-                            EXPECT WITH <br />
-                            <span className="text-[#F9C784] drop-shadow-sm">CONFIDENCE.</span>
+                            FIND THE <span className="text-[#F9C784]">LIFELINE.</span> <br />
+                            FUND THE <span className="text-[#F9C784]">MISSION.</span>
                         </motion.h1>
 
                         <motion.p
                             variants={maskReveal}
                             className="text-xl text-[#1E1B4B]/60 font-medium max-w-lg leading-relaxed mb-12"
                         >
-                            A direct lifeline connecting expectant mothers in rural districts to world-class maternal specialists through AI-driven coordination.
+                            Automating critical outreach to PHCs, NGOs, and Funders across AP and Telangana to ensure every mother is reached.
                         </motion.p>
 
                         {/* Integrated Reference Toggle/Pill CTA */}
@@ -79,7 +79,7 @@ export function AuroraHero() {
                                     onClick={handleStart}
                                     className="px-10 py-4 rounded-full bg-[#1E1B4B] text-white font-black text-[11px] uppercase tracking-widest shadow-xl shadow-[#1E1B4B]/10 hover:scale-[1.02] transition-transform active:scale-95"
                                 >
-                                    Get Support Now
+                                    Launch AI Discovery
                                 </button>
                                 <button
                                     className="px-10 py-4 rounded-full text-[#1E1B4B] font-black text-[11px] uppercase tracking-widest hover:text-[#F9C784] transition-colors"

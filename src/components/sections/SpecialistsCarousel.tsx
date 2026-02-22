@@ -3,21 +3,21 @@ import { useRef } from 'react'
 
 const specialists = [
     {
-        name: 'Dr. Aruna Reddy',
-        role: 'Maternal health Lead',
-        clinic: 'Apollo Guntur',
+        name: 'Mother Onboarding Finder',
+        role: 'CLINICAL DISCOVERY ENGINE',
+        clinic: 'AUTO-RANKING PHC & MEDICAL COLLEGES',
         img: 'https://images.unsplash.com/photo-1559839734-2b71f1536783?auto=format&fit=crop&q=80&w=400'
     },
     {
-        name: 'Dr. Vikram Seth',
-        role: 'Neonatal Specialist',
-        clinic: 'Rainbow Children’s',
+        name: 'Funding & Partnership Scout',
+        role: 'MISSION SUSTAINABILITY ENGINE',
+        clinic: 'GLOBAL FOUNDATIONS (GATES, SKOLL)',
         img: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=400'
     },
     {
-        name: 'Sarah Chen',
-        role: 'NGO Coordinator',
-        clinic: 'Saheli Trust',
+        name: 'District Outreach Optimizer',
+        role: 'LOGISTICS SYNC ENGINE',
+        clinic: 'HYPER-LOCAL MANDAL INTEL',
         img: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=400'
     },
     {
@@ -41,8 +41,8 @@ export function SpecialistsCarousel() {
         <section className="py-32 overflow-hidden bg-white">
             <div className="px-12 lg:px-24 mb-16 flex items-end justify-between">
                 <div className="space-y-4">
-                    <h3 className="text-[11px] font-black uppercase tracking-[0.5em] text-[#1E1B4B]/60">Network Integrity</h3>
-                    <h2 className="text-6xl md:text-7xl font-black tracking-tighter text-[#1E1B4B] uppercase">Meet Our Specialists</h2>
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.5em] text-[#1E1B4B]/60">Engine Intelligence</h3>
+                    <h2 className="text-6xl md:text-7xl font-black tracking-tighter text-[#1E1B4B] uppercase">Discovery Engines</h2>
                 </div>
                 <div className="flex gap-3">
                     <div className="w-12 h-1.5 rounded-full bg-slate-100" />

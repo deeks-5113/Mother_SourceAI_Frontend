@@ -3,7 +3,7 @@ export type ViewType = 'hero' | 'home' | 'outreach' | 'funding' | 'admin'
 export interface Entity {
     id: string
     name: string
-    type: 'NGO' | 'PHC' | 'Government Scheme'
+    type: 'NGO' | 'PHC' | 'Government Scheme' | 'Funding'
     district: string
     ruralUrban: 'Rural' | 'Urban'
     relevance: number
@@ -36,9 +36,21 @@ export const mockEntities: Entity[] = [
         ruralUrban: 'Rural',
         relevance: 94,
         ai_reasoning:
-            'High alignment with maternal health mandate. Active in 12 villages within Anantapur cluster. Previously ran ASHA worker training programs — strong grassroots network for beneficiary identification.',
+            'Entity resolved from NHM Portal and 2025 NGO Darpan filings. High rural mother outreach history in Anantapur cluster. Previously ran ASHA worker training programs — highly effective grassroots network.',
         draftEmail:
             'Dear Saheli Team,\n\nWe are reaching out from MotherSource AI, a platform dedicated to connecting underserved mothers with essential resources. Our AI analysis indicates a 94% alignment between your organization\'s work and the needs of mothers in the Anantapur cluster.\n\nWe would love to explore a partnership to extend your ASHA worker network for beneficiary identification.\n\nWarm regards,\nMotherSource AI',
+    },
+    {
+        id: 'e9',
+        name: 'Skoll Foundation — India Health Fund',
+        type: 'Funding',
+        district: 'Hyderabad (HQ)',
+        ruralUrban: 'Urban',
+        relevance: 91,
+        ai_reasoning:
+            'Entity resolved from Global Philanthropy Index. Focus aligned with "Universal Maternal Coverage" mandate. Strong history of funding tech-driven health interventions in AP/Telangana.',
+        draftEmail:
+            'Dear Skoll Foundation India Team,\n\nMotherSource AI is currently mobilizing a district-wide maternal health lifeline across AP and Telangana. Given your focus on tech-driven health interventions, we invite you to anchor this mission.',
     },
     {
         id: 'e2',
@@ -48,7 +60,7 @@ export const mockEntities: Entity[] = [
         ruralUrban: 'Urban',
         relevance: 87,
         ai_reasoning:
-            'Covers 23,000+ registered beneficiaries. Reports indicate consistent ANC visit data available. co-location with ICDS center creates synergy for nutritional support hand-off.',
+            'Entity resolved from National Health Portal (NHM). Covers 23,000+ registered beneficiaries. co-location with ICDS center creates synergy for nutritional support hand-off.',
         draftEmail:
             'Dear PHC Kakinada Central,\n\nMotherSource AI has identified your facility as a key partner for our maternal health outreach initiative...',
     },
